@@ -2,73 +2,68 @@ import { useEffect, useMemo, useState } from "react";
 import { productItems } from "../data/productItems";
 import SalesForm from "../components/SalesForm";
 import SalesTable from "../components/SalesTable";
-import ExpenseForm from "../components/ExpenseForm";
-import ExpenseTable from "../components/ExpenseTable";
 import {
-    loadSales, saveSales,
-    loadExpenses, saveExpenses,
-    loadExpenseCategories, saveExpenseCategories,
-    clearAllData
+    loadSales,
+    saveSales,
+    loadSaleCategories,
+    saveSaleCategories,
+    clearAllData,
 } from "../utils/storage";
 
 export default function Journal() {
     const [sales, setSales] = useState(() => loadSales());
-    const [expenses, setExpenses] = useState(() => loadExpenses());
-    const [customCategories, setCustomCategories] = useState(() => loadExpenseCategories());
+
+    const defaultCats = useMemo(
+        () => Array.from(new Set(productItems.map((p) => p.category))),
+        []
+    );
+
+    const [categories, setCategories] = useState(() => {
+        const saved = loadSaleCategories();
+        const merged = [...defaultCats];
+
+        for (const c of saved) {
+            const cc = String(c).trim();
+            if (!cc) continue;
+            if (!merged.some((x) => x.toLowerCase() === cc.toLowerCase())) merged.push(cc);
+        }
+        return merged;
+    });
 
     useEffect(() => saveSales(sales), [sales]);
-    useEffect(() => saveExpenses(expenses), [expenses]);
-    useEffect(() => saveExpenseCategories(customCategories), [customCategories]);
+    useEffect(() => saveSaleCategories(categories), [categories]);
 
-    const sortedSales = useMemo(
-        () => [...sales].sort((a, b) => (a.date < b.date ? 1 : -1)),
-        [sales]
-    );
-
-    const sortedExpenses = useMemo(
-        () => [...expenses].sort((a, b) => (a.date < b.date ? 1 : -1)),
-        [expenses]
-    );
-
-    function addSale(s) {
-        setSales((prev) => [s, ...prev]);
+    function addSale(newSale) {
+        setSales((prev) => [newSale, ...prev]);
     }
 
     function deleteSale(id) {
-        setSales((prev) => prev.filter((x) => x.id !== id));
+        setSales((prev) => prev.filter((s) => s.id !== id));
     }
 
     function addCategory(cat) {
-        setCustomCategories((prev) => {
-            const normalized = cat.trim();
-            if (!normalized) return prev;
-            if (prev.some((c) => c.toLowerCase() === normalized.toLowerCase())) return prev;
-            return [...prev, normalized];
+        const c = String(cat).trim();
+        if (!c) return;
+
+        setCategories((prev) => {
+            if (prev.some((x) => x.toLowerCase() === c.toLowerCase())) return prev;
+            return [...prev, c];
         });
     }
 
-    function addExpense(e) {
-        setExpenses((prev) => [e, ...prev]);
-    }
-
-    function deleteExpense(id) {
-        setExpenses((prev) => prev.filter((x) => x.id !== id));
-    }
-
     function seedDemoData() {
-        // quick demo to test charts
-        const picks = productItems.slice(0, 12);
         const now = new Date();
         const demo = [];
+
         for (let i = 0; i < 25; i++) {
-            const p = picks[Math.floor(Math.random() * picks.length)];
+            const p = productItems[Math.floor(Math.random() * productItems.length)];
             const d = new Date(now);
             d.setDate(d.getDate() - Math.floor(Math.random() * 20));
-            const iso = d.toISOString().slice(0, 10);
-            const qty = 1 + Math.floor(Math.random() * 6);
+            const qty = 1 + Math.floor(Math.random() * 5);
+
             demo.push({
                 id: crypto.randomUUID(),
-                date: iso,
+                date: d.toISOString().slice(0, 10),
                 productName: p.itemName,
                 category: p.category,
                 unitPrice: p.unitPrice,
@@ -76,29 +71,14 @@ export default function Journal() {
                 total: qty * p.unitPrice,
             });
         }
-        setSales((prev) => [...demo, ...prev]);
 
-        const expCats = ["Rent", "Transport", "Utilities", "Marketing", ...customCategories];
-        const demoExp = [];
-        for (let i = 0; i < 12; i++) {
-            const d = new Date(now);
-            d.setDate(d.getDate() - Math.floor(Math.random() * 25));
-            demoExp.push({
-                id: crypto.randomUUID(),
-                date: d.toISOString().slice(0, 10),
-                category: expCats[Math.floor(Math.random() * expCats.length)],
-                amount: 50 + Math.floor(Math.random() * 900),
-                note: "demo",
-            });
-        }
-        setExpenses((prev) => [...demoExp, ...prev]);
+        setSales((prev) => [...demo, ...prev]);
     }
 
     function resetAll() {
         clearAllData();
         setSales([]);
-        setExpenses([]);
-        setCustomCategories([]);
+        setCategories(defaultCats);
     }
 
     return (
@@ -106,12 +86,11 @@ export default function Journal() {
             <div className="pageHead">
                 <div>
                     <h1>Sales Journal</h1>
-                    <p className="muted">Record sales and expenses. Data is saved in localStorage.</p>
                 </div>
 
                 <div className="actions">
                     <button className="btn" type="button" onClick={seedDemoData}>
-                        Seed Demo Data (Charts Test)
+                        Seed Demo Data
                     </button>
                     <button className="btn danger" type="button" onClick={resetAll}>
                         Clear All Data
@@ -119,15 +98,14 @@ export default function Journal() {
                 </div>
             </div>
 
-            <SalesForm products={productItems} onAddSale={addSale} />
-            <SalesTable sales={sortedSales} onDelete={deleteSale} />
-
-            <ExpenseForm
-                customCategories={customCategories}
+            <SalesForm
+                products={productItems}
+                categories={categories}
                 onAddCategory={addCategory}
-                onAddExpense={addExpense}
+                onAddSale={addSale}
             />
-            <ExpenseTable expenses={sortedExpenses} onDelete={deleteExpense} />
+
+            <SalesTable sales={sales} onDelete={deleteSale} />
         </div>
     );
 }

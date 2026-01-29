@@ -9,8 +9,6 @@ import {
     PieChart,
     Pie,
     Cell,
-    BarChart,
-    Bar,
 } from "recharts";
 
 function fmtMoney(n) {
@@ -30,12 +28,7 @@ export function TrendLine({ data }) {
                         <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                         <YAxis tick={{ fontSize: 12 }} />
                         <Tooltip formatter={(v) => fmtMoney(v)} />
-                        <Line
-                            type="monotone"
-                            dataKey="sales"
-                            strokeWidth={3}
-                            dot={false}
-                        />
+                        <Line type="monotone" dataKey="sales" strokeWidth={3} dot={false} />
                     </LineChart>
                 </ResponsiveContainer>
             </div>
@@ -44,7 +37,6 @@ export function TrendLine({ data }) {
 }
 
 export function CategoryPie({ data }) {
-    // fixed palette => various colors
     const colors = [
         "#60a5fa",
         "#34d399",
@@ -83,58 +75,11 @@ export function CategoryPie({ data }) {
             <div className="legend">
                 {data.map((d, i) => (
                     <div className="legendItem" key={d.name}>
-                        <span
-                            className="dot"
-                            style={{ background: colors[i % colors.length] }}
-                        />
+                        <span className="dot" style={{ background: colors[i % colors.length] }} />
                         <span className="legendName">{d.name}</span>
                         <span className="legendVal">{fmtMoney(d.value)}</span>
                     </div>
                 ))}
-            </div>
-        </div>
-    );
-}
-
-export function ProductBar({ data }) {
-    // different color for each bar (Top 10)
-    const colors = [
-        "#60a5fa",
-        "#34d399",
-        "#fbbf24",
-        "#f87171",
-        "#a78bfa",
-        "#fb7185",
-        "#22c55e",
-        "#f97316",
-        "#06b6d4",
-        "#e879f9",
-    ];
-
-    return (
-        <div className="card">
-            <div className="cardTitle">Sales by Product (Top 10)</div>
-            <div className="chartBox">
-                <ResponsiveContainer width="100%" height={280}>
-                    <BarChart data={data}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis
-                            dataKey="name"
-                            tick={{ fontSize: 11 }}
-                            interval={0}
-                            angle={-12}
-                            height={60}
-                        />
-                        <YAxis tick={{ fontSize: 12 }} />
-                        <Tooltip formatter={(v) => fmtMoney(v)} />
-
-                        <Bar dataKey="value">
-                            {data.map((_, i) => (
-                                <Cell key={`cell-${i}`} fill={colors[i % colors.length]} />
-                            ))}
-                        </Bar>
-                    </BarChart>
-                </ResponsiveContainer>
             </div>
         </div>
     );

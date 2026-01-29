@@ -1,39 +1,31 @@
-const KEYS = {
-    SALES: "pos-sales",
-    EXPENSES: "pos-expenses",
-    CUSTOM_EXPENSE_CATEGORIES: "pos-expense-categories",
-};
+const SALES_KEY = "pos-sales";
+const SALE_CATS_KEY = "pos-sale-categories";
 
-function safeParse(json, fallback) {
+export function loadSales() {
     try {
-        const v = JSON.parse(json);
-        return v ?? fallback;
+        return JSON.parse(localStorage.getItem(SALES_KEY)) || [];
     } catch {
-        return fallback;
+        return [];
     }
 }
 
-export function loadSales() {
-    return safeParse(localStorage.getItem(KEYS.SALES), []);
-}
 export function saveSales(sales) {
-    localStorage.setItem(KEYS.SALES, JSON.stringify(sales));
+    localStorage.setItem(SALES_KEY, JSON.stringify(sales));
 }
 
-export function loadExpenses() {
-    return safeParse(localStorage.getItem(KEYS.EXPENSES), []);
-}
-export function saveExpenses(expenses) {
-    localStorage.setItem(KEYS.EXPENSES, JSON.stringify(expenses));
+export function loadSaleCategories() {
+    try {
+        return JSON.parse(localStorage.getItem(SALE_CATS_KEY)) || [];
+    } catch {
+        return [];
+    }
 }
 
-export function loadExpenseCategories() {
-    return safeParse(localStorage.getItem(KEYS.CUSTOM_EXPENSE_CATEGORIES), []);
-}
-export function saveExpenseCategories(categories) {
-    localStorage.setItem(KEYS.CUSTOM_EXPENSE_CATEGORIES, JSON.stringify(categories));
+export function saveSaleCategories(categories) {
+    localStorage.setItem(SALE_CATS_KEY, JSON.stringify(categories));
 }
 
 export function clearAllData() {
-    Object.values(KEYS).forEach((k) => localStorage.removeItem(k));
+    localStorage.removeItem(SALES_KEY);
+    localStorage.removeItem(SALE_CATS_KEY);
 }
