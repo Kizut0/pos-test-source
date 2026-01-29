@@ -1,3 +1,7 @@
+/* =========================
+   USER-FRIENDLY LIGHT THEME
+   (applies to BOTH pages)
+========================= */
 :root {
     /* Background */
     --bg: #f5f7fb;
@@ -31,7 +35,9 @@
     --shadow: 0 10px 24px rgba(15, 23, 42, .08);
 }
 
-
+/* =========================
+   GLOBAL
+========================= */
 * {
     box-sizing: border-box
 }
@@ -61,7 +67,9 @@ a {
     color: var(--muted)
 }
 
-
+/* =========================
+   LAYOUT
+========================= */
 .app {
     min-height: 100vh;
     display: flex;
@@ -94,7 +102,9 @@ a {
     flex-wrap: wrap;
 }
 
-
+/* =========================
+   TOP BAR
+========================= */
 .topbar {
     position: sticky;
     top: 0;
@@ -141,7 +151,9 @@ a {
     color: var(--muted)
 }
 
-
+/* =========================
+   NAV
+========================= */
 .nav {
     display: flex;
     gap: 10px;
@@ -170,7 +182,9 @@ a {
     color: #0b1b3a;
 }
 
-
+/* =========================
+   CARDS
+========================= */
 .card {
     background: var(--card);
     border: 1px solid var(--border);
@@ -184,7 +198,9 @@ a {
     margin-bottom: 12px;
 }
 
-
+/* =========================
+   KPI
+========================= */
 .kpiGrid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -213,6 +229,9 @@ a {
     margin-top: 6px;
 }
 
+/* =========================
+   CHARTS
+========================= */
 .grid2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -254,11 +273,15 @@ a {
     color: #0b1220;
 }
 
+/* =========================
+   FORMS
+========================= */
 
+/* ✅ Make all 5 fields same width + button auto */
 .gridForm {
     display: grid;
-    grid-template-columns: 2fr 1.2fr 1fr 1fr 1.2fr auto;
-    gap: 10px;
+    grid-template-columns: repeat(5, 1fr) auto;
+    gap: 12px;
     align-items: end;
 }
 
@@ -287,24 +310,47 @@ select:focus {
     box-shadow: 0 0 0 4px rgba(37, 99, 235, .12);
 }
 
+input[type="number"] {
+    text-align: center;
+}
+
+/* Total box */
 .totalBox {
-    padding: 10px 12px;
     border-radius: 12px;
     border: 1px dashed rgba(37, 99, 235, .25);
     background: rgba(37, 99, 235, .06);
     font-weight: 900;
     color: #0b1b3a;
+
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
 }
 
+/* ✅ Uniform height for Record Sale + Add Product */
+.gridForm input,
+.gridForm select,
+.gridForm .totalBox,
+.gridForm .btn {
+    height: 44px;
+    display: flex;
+    align-items: center;
+}
+
+/* =========================
+   BUTTONS
+========================= */
 .btn {
     border: 1px solid rgba(15, 23, 42, .14);
     background: rgba(255, 255, 255, .9);
     color: #0f172a;
-    padding: 10px 14px;
+    padding: 0 16px;
+    /* important for same height */
     border-radius: 14px;
     cursor: pointer;
     font-weight: 900;
     transition: .15s ease;
+    white-space: nowrap;
 }
 
 .btn:hover {
@@ -333,7 +379,9 @@ select:focus {
     background: rgba(220, 38, 38, .18);
 }
 
-
+/* =========================
+   TABLES
+========================= */
 .tableWrap {
     overflow: auto;
     border-radius: 14px;
@@ -363,7 +411,9 @@ tr:hover td {
     background: rgba(37, 99, 235, .04);
 }
 
-
+/* =========================
+   LIST (TOP 5)
+========================= */
 .list {
     display: flex;
     flex-direction: column;
@@ -399,7 +449,9 @@ tr:hover td {
     font-weight: 900
 }
 
-
+/* =========================
+   SEGMENT BUTTONS
+========================= */
 .seg {
     display: flex;
     gap: 8px;
@@ -430,32 +482,9 @@ tr:hover td {
     color: #0b1b3a;
 }
 
-
-.hr {
-    height: 1px;
-    background: rgba(15, 23, 42, .10);
-    margin: 12px 0;
-}
-
-.addCatRow {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
-.addCatControls {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.addCatControls input {
-    width: 220px;
-}
-
-
+/* =========================
+   DEMO TIP
+========================= */
 .hintBox {
     padding: 12px 14px;
     border-radius: 14px;
@@ -464,7 +493,9 @@ tr:hover td {
     color: #0b1b3a;
 }
 
-
+/* =========================
+   FOOTER
+========================= */
 .footer {
     border-top: 1px solid var(--border);
     padding: 14px 0;
@@ -473,7 +504,9 @@ tr:hover td {
     background: rgba(255, 255, 255, .55);
 }
 
-
+/* =========================
+   RESPONSIVE
+========================= */
 @media (max-width: 980px) {
     .kpiGrid {
         grid-template-columns: 1fr 1fr
@@ -492,53 +525,8 @@ tr:hover td {
     }
 }
 
-/* === Make Record Sale row uniform height === */
-.gridForm input,
-.gridForm select,
-.gridForm .totalBox,
-.gridForm .btn {
-    height: 44px;
-    display: flex;
-    align-items: center;
-}
-
-.btn {
-    border: 1px solid rgba(15, 23, 42, .14);
-    background: rgba(255, 255, 255, .9);
-    color: #0f172a;
-    padding: 0 16px;
-    /* ⬅ remove vertical padding */
-    border-radius: 14px;
-    cursor: pointer;
-    font-weight: 900;
-    transition: .15s ease;
-}
-
-.totalBox {
-    display: flex;
-    align-items: center;
-}
-
-/* === Uniform height for Record Sale & Add Category actions === */
-.gridForm input,
-.gridForm select,
-.gridForm .totalBox,
-.gridForm .btn,
-.addCatControls input,
-.addCatControls .btn {
-    height: 44px;
-    display: flex;
-    align-items: center;
-}
-
-.btn {
-    border: 1px solid rgba(15, 23, 42, .14);
-    background: rgba(255, 255, 255, .9);
-    color: #0f172a;
-    padding: 0 16px;
-    /* ⬅ horizontal padding only */
-    border-radius: 14px;
-    cursor: pointer;
-    font-weight: 900;
-    transition: .15s ease;
+input:disabled {
+    background: rgba(37, 99, 235, .06);
+    border-color: rgba(37, 99, 235, .18);
+    color: #0b1b3a;
 }

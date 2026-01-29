@@ -2,20 +2,23 @@ import { useEffect, useMemo, useState } from "react";
 import { productItems } from "../data/productItems";
 import SalesForm from "../components/SalesForm";
 import SalesTable from "../components/SalesTable";
+import AddProductForm from "../components/AddProductForm";
 import {
     loadSales,
     saveSales,
+    loadProducts,
+    saveProducts,
     loadSaleCategories,
     saveSaleCategories,
-    clearAllData,
 } from "../utils/storage";
 
 export default function Journal() {
     const [sales, setSales] = useState(() => loadSales());
+    const [products, setProducts] = useState(() => loadProducts(productItems));
 
     const defaultCats = useMemo(
-        () => Array.from(new Set(productItems.map((p) => p.category))),
-        []
+        () => Array.from(new Set(products.map((p) => p.category))),
+        [products]
     );
 
     const [categories, setCategories] = useState(() => {
@@ -31,7 +34,19 @@ export default function Journal() {
     });
 
     useEffect(() => saveSales(sales), [sales]);
-    useEffect(() => saveSaleCategories(categories), [categories]);
+    useEffect(() => saveProducts(products), [products]);
+
+    useEffect(() => {
+        const merged = [...defaultCats];
+        for (const c of categories) {
+            const cc = String(c).trim();
+            if (!cc) continue;
+            if (!merged.some((x) => x.toLowerCase() === cc.toLowerCase())) merged.push(cc);
+        }
+        setCategories(merged);
+        saveSaleCategories(merged);
+
+    }, [defaultCats]);
 
     function addSale(newSale) {
         setSales((prev) => [newSale, ...prev]);
@@ -41,44 +56,37 @@ export default function Journal() {
         setSales((prev) => prev.filter((s) => s.id !== id));
     }
 
-    function addCategory(cat) {
-        const c = String(cat).trim();
-        if (!c) return;
+    function addProduct(p) {
 
-        setCategories((prev) => {
-            if (prev.some((x) => x.toLowerCase() === c.toLowerCase())) return prev;
-            return [...prev, c];
-        });
-    }
+        const existsExact = products.some(
+            (x) =>
+                x.itemName.toLowerCase() === p.itemName.toLowerCase() &&
+                x.category.toLowerCase() === p.category.toLowerCase()
+        );
 
-    function seedDemoData() {
-        const now = new Date();
-        const demo = [];
-
-        for (let i = 0; i < 25; i++) {
-            const p = productItems[Math.floor(Math.random() * productItems.length)];
-            const d = new Date(now);
-            d.setDate(d.getDate() - Math.floor(Math.random() * 20));
-            const qty = 1 + Math.floor(Math.random() * 5);
-
-            demo.push({
-                id: crypto.randomUUID(),
-                date: d.toISOString().slice(0, 10),
-                productName: p.itemName,
-                category: p.category,
-                unitPrice: p.unitPrice,
-                qty,
-                total: qty * p.unitPrice,
-            });
+        if (existsExact) {
+            alert("This product already exists.");
+            return;
         }
 
-        setSales((prev) => [...demo, ...prev]);
-    }
+        const existsNameDifferentCat = products.some(
+            (x) =>
+                x.itemName.toLowerCase() === p.itemName.toLowerCase() &&
+                x.category.toLowerCase() !== p.category.toLowerCase()
+        );
 
-    function resetAll() {
-        clearAllData();
-        setSales([]);
-        setCategories(defaultCats);
+        if (existsNameDifferentCat) {
+            alert("This product name already exists under a different category.");
+            return;
+        }
+
+
+        setProducts((prev) => [...prev, p]);
+
+        setCategories((prev) => {
+            if (prev.some((c) => c.toLowerCase() === p.category.toLowerCase())) return prev;
+            return [...prev, p.category];
+        });
     }
 
     return (
@@ -87,23 +95,15 @@ export default function Journal() {
                 <div>
                     <h1>Sales Journal</h1>
                 </div>
-
-                <div className="actions">
-                    <button className="btn" type="button" onClick={seedDemoData}>
-                        Seed Demo Data
-                    </button>
-                    <button className="btn danger" type="button" onClick={resetAll}>
-                        Clear All Data
-                    </button>
-                </div>
             </div>
 
-            <SalesForm
-                products={productItems}
+            <AddProductForm
+                products={products}
                 categories={categories}
-                onAddCategory={addCategory}
-                onAddSale={addSale}
+                onAddProduct={addProduct}
             />
+
+            <SalesForm products={products} onAddSale={addSale} />
 
             <SalesTable sales={sales} onDelete={deleteSale} />
         </div>
